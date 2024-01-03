@@ -1,62 +1,50 @@
 const _ = require('lodash')
-const { v4: uuidv4 } = require('uuid')
-const crypto = require('crypto')
 const express = require('express')
 const app = express()
 
-app.use(express.json())
+const signupRoute = require('./server/routes/signup')
+const signinRoute = require('./server/routes/signin')
 
-function encryptPassword (password) {
-    return crypto
-        .createHash('sha256')
-        .update(password + '#0g830T8Ha)*fdH9312R{}')
-        .digest('base64')
+const encryptPassword = require('./lib/encryptPassword')
+const initExpressApp = require('./server/initExpressApp')
+const User = require('./DB/users.schema')
+
+async function a() {
+    console.log('DB 접속 시도')
+    await dbConnect()
+    console.log('DB 접속 완료')
+
+    await User.create({
+        id: 'asdf',
+        password: 'asdf',
+        name: '123123',
+        age: 19
+    })
 }
+a()
 
-let users = [{
-    idx: uuidv4(),
-    id: 'digitect1',
-    password: encryptPassword('thisispassword'),
-    name: '홍길동',
-    gender: 'male',
-    age: 21,
-    phoneNumber: '010-0000-0000'
-}]
+initExpressApp(app)
 
-app.post('/signup', (req, res) => {
-    const user = _.pick(
-        req.body,
-        [
-            'id',
-            'password',
-            'name',
-            'gender',
-            'age',
-            'phoneNumber'
-        ]
-    )
+const routes = [
+    signinRoute,
+    signupRoute
+]
 
-    users.push(Object.assign(user, { idx: uuidv4() }))
+routes.forEach(route => [
+    app[route.method](route.path, route.handler)
+])
 
-    return res.json({ success: true })
-})
+//npm i mongoose
+//qSIYNOQ8Ot52Icdt
 
-app.post('/signin', (req, res)=> {
-    const {id, password} = req.body
-    let success = false
+app.get('/users/me', (req, res) => {
+    const {idx} = ewq.session
 
-    function isUserByIdAndPassword(){
-        const user = users.find(user =>{
-            return user.id === id && user.password == encryptPassword(password)
-        })
-        return user !== undefined
-    }    
-    
-    if(isUserByIdAndPassword){
-        success = true
-    }
+    const me = users.find(user=>{
+        return user.idx === idx
+    })
 
-    return res.json({success})
+    return res.json(me)
 })
 
 app.get('/users', (req, res) => {
