@@ -4,6 +4,7 @@
 2. npm init -> 항목 모두 엔터
 3. npm install express (express 라이브러리 설치)
 4. npm run dev 서버 실행
+npm i method-override
 
 ## 알아둘점
 > require - 모듈 불러올 때 사용.

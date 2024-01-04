@@ -11,14 +11,8 @@ moduleAlias.addAliases({
     '@server' :__dirname+'/server',
 })
 
-const signupRoute = require('@routes/users/signup')
-const signinRoute = require('@routes/users/signin')
-const usersmeRoute = require('@routes/users/usersme')
-const usersRoute = require('@routes/users/users')
-const updateUserRoute = require('@routes/users/updateUser')
-const deleteUserRoute = require('@routes/users/deleteUser')
-
-const createPosts = require('@routes/posts/createPost')
+const routes = require('@routes')
+console.log(routes)
 
 const dbConnect = require('@db/connect')
 const initExpressApp = require('@server/initExpressApp')
@@ -30,16 +24,6 @@ async function bootstrap() {
 
     initExpressApp(app)
     
-    const routes = [
-        signinRoute,
-        signupRoute,
-        usersmeRoute,
-        usersRoute,
-        updateUserRoute,
-        deleteUserRoute,
-        createPosts
-    ]
-
     routes.forEach(route => {
         app[route.method](route.path, (req, res) => {
             route.handler(req, res)
