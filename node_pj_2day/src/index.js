@@ -2,6 +2,7 @@ const _ = require('lodash')
 const express = require('express')
 const app = express()
 
+const dbConnect = require('./DB/connect')
 const signupRoute = require('./server/routes/signup')
 const signinRoute = require('./server/routes/signin')
 
@@ -14,12 +15,12 @@ async function a() {
     await dbConnect()
     console.log('DB 접속 완료')
 
-    await User.create({
-        id: 'asdf',
-        password: 'asdf',
-        name: '123123',
-        age: 19
-    })
+    // await User.create({
+    //     id: 'jms',
+    //     password: '1234',
+    //     name: '전민수',
+    //     age: 19
+    // })
 }
 a()
 

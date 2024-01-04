@@ -6,6 +6,8 @@
 4. npm run dev 서버 실행
 
 ## 알아둘점
+> require - 모듈 불러올 때 사용.
+
 ### 통신규격
 - HTTP, HTTPS
 - SSH, SCP

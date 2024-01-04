@@ -1,37 +1,29 @@
 const _ = require('lodash')
-const { v4: uuidv4 } = require('uuid')
-const users = require('../../DB/users')
+const User = require('../../DB/users.schema')
 
 module.exports = {
-    path: '/signin',
+    path: '/signup',
     method: 'post',
-    handler: (req, res) => {
+    handler: async (req, res) => {
         const user = _.pick(
             req.body,
             [
                 'id',
                 'password',
                 'name',
-                'gender',
-                'age',
-                'phoneNumber'
+                'age'
             ]
         )
 
-        function duplicatedUser() {
-            return users.find(user => user.id === req.body.id)
+        async function duplicatedUser() {
+            return await User.findOne({id: user.id})
         }
 
-        if (duplicatedUser() === undefined) {
-            users.push(Object.assign(user, {
-                idx: uuidv4(),
-                ...(user.password !== undefined && {
-                    password: encryptPassword(user.password)
-                })
-            }))
-            return res._construct.json({ success: true })
+        if (await duplicatedUser() === null) {
+            await User.create(user)
+            return res.json({ success: true })
         }
+        return res.status(400).json({ success: false })
 
-        return res.json({ success: true })
     }
 }
