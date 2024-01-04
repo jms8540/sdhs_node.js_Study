@@ -19,7 +19,7 @@ const postSchema = new Schema({
         default: 0
     }
 }, {
-    timestamp: true
+    timestamps: true
 })
 
 module.exports = model('Post', postSchema)
