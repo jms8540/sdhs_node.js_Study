@@ -6,7 +6,6 @@ module.exports = {
     method: 'post',
     handler: async (req, res)=> {
         const {_id} = req.session
-
         if(_id === undefined){
             throw new Error('401:로그인을 해주세요.')
         }

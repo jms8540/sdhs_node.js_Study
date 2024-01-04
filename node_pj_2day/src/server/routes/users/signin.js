@@ -19,7 +19,7 @@ module.exports = {
             throw new Error('401: 아이디와 비번이 불일치.')
         }
         
-        req.session.idx = user._id
+        req.session._id = user._id
 
         return res.json({success: true})
     }
