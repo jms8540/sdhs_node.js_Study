@@ -1,91 +1,82 @@
 const _ = require('lodash')
 const express = require('express')
 const app = express()
+const moduleAlias = require('module-alias')
 
-const dbConnect = require('./DB/connect')
-const signupRoute = require('./server/routes/signup')
-const signinRoute = require('./server/routes/signin')
+moduleAlias.addAliases({
+    '@root' :__dirname,
+    '@db' :__dirname+'/DB',
+    '@routes' :__dirname+'/server/routes',
+    '@lib' :__dirname+'/lib',
+    '@server' :__dirname+'/server',
+})
 
-const encryptPassword = require('./lib/encryptPassword')
-const initExpressApp = require('./server/initExpressApp')
-const User = require('./DB/users.schema')
+const signupRoute = require('@routes/users/signup')
+const signinRoute = require('@routes/users/signin')
+const usersmeRoute = require('@routes/users/usersme')
+const usersRoute = require('@routes/users/users')
+const updateUserRoute = require('@routes/users/updateUser')
+const deleteUserRoute = require('@routes/users/deleteUser')
 
-async function a() {
+const createPosts = require('@routes/posts/createPost')
+
+const dbConnect = require('@db/connect')
+const initExpressApp = require('@server/initExpressApp')
+
+async function bootstrap() {
     console.log('DB 접속 시도')
     await dbConnect()
     console.log('DB 접속 완료')
 
-    // await User.create({
-    //     id: 'jms',
-    //     password: '1234',
-    //     name: '전민수',
-    //     age: 19
-    // })
+    initExpressApp(app)
+    
+    const routes = [
+        signinRoute,
+        signupRoute,
+        usersmeRoute,
+        usersRoute,
+        updateUserRoute,
+        deleteUserRoute,
+        createPosts
+    ]
+
+    routes.forEach(route => {
+        app[route.method](route.path, (req, res) => {
+            route.handler(req, res)
+                .catch((err) => {
+                    console.error('Api Error', err)
+
+                    const [statusCode, errorMessage] = err.message.split(':')
+
+                    return res
+                        .status(statusCode)
+                        .json({
+                            success: false,
+                            message: errorMessage
+                        })
+                })
+        })
+    })
+
+    const port = 3000
+    app.listen(port, () => {
+        console.log(`App is running on port: ${port}`)
+    })
 }
-a()
-
-initExpressApp(app)
-
-const routes = [
-    signinRoute,
-    signupRoute
-]
-
-routes.forEach(route => [
-    app[route.method](route.path, route.handler)
-])
+bootstrap()
+    .catch(err => {
+        console.error('에러 발생!', err)
+    })
 
 //npm i mongoose
 //qSIYNOQ8Ot52Icdt
 
-app.get('/users/me', (req, res) => {
-    const {idx} = ewq.session
-
-    const me = users.find(user=>{
-        return user.idx === idx
-    })
-
-    return res.json(me)
-})
 
 app.get('/users', (req, res) => {
     return res.json(users)
 })
 
-app.patch('/users/:userId', (req, res) => {
-    const { userId } = req.params
-    const body = req.body
 
-    // for (let i = 0; i < users.length; i++) {
-    //     if (users[i].id === userId) {
-    //         if (req.body.name !== undefined) {
-    //             users[i].name = req.body.name
-    //         }
-    //     }
-    // }
-
-    // for (let i = 0; i < users.length; i++) {
-    //     if (users[i].id === userId) {
-    //         const newUser = _.pick(req.body, ['name', 'age', 'gender', 'phoneNumber'])
-    //         Object.assign(users[i], newUser)
-    //     }
-    // }
-
-    const userIndex = users.findIndex((user) => {
-        return user.idx === userId
-    })
-    const newUser = _.pick(req.body, ['id', 'password', 'name', 'age', 'gender', 'phoneNumber'])
-
-    // falsy
-
-    if (newUser.password) {
-        newUser.password = encryptPassword(newUser.password)
-    }
-
-    Object.assign(users[userIndex], newUser)
-
-    return res.json({ success: true })
-})
 
 app.delete('/users/:userId', (req, res) => {
     const { userId } = req.params
@@ -100,8 +91,4 @@ app.delete('/users/:userId', (req, res) => {
     return res.json({ success: true })
 })
 
-const port = 3000
-app.listen(port, () => {
-    console.log(`App is running on port: ${port}`)
-})
 
