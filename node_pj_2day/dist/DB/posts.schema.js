@@ -1,6 +1,8 @@
-const {model, Schema} = require('mongoose')
-
-const postSchema = new Schema({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Post = void 0;
+const mongoose_1 = require("mongoose");
+const postSchema = new mongoose_1.Schema({
     title: {
         type: String,
         required: true
@@ -20,6 +22,6 @@ const postSchema = new Schema({
     }
 }, {
     timestamps: true
-})
-
-module.exports = model('Post', postSchema)
+});
+exports.Post = (0, mongoose_1.model)('Post', postSchema);
+//# sourceMappingURL=posts.schema.js.map

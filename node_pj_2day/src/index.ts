@@ -1,25 +1,28 @@
-const _ = require('lodash')
-const express = require('express')
-const app = express()
-const moduleAlias = require('module-alias')
+import _ from 'lodash'
+import express from 'express'
+import {connectDB} from './DB/connect'
+import {initExpressApp} from "./server/initExpressApp"
+import { Route } from './types/Route'
 
-moduleAlias.addAliases({
-    '@root' :__dirname,
-    '@db' :__dirname+'/DB',
-    '@routes' :__dirname+'/server/routes',
-    '@lib' :__dirname+'/lib',
-    '@server' :__dirname+'/server',
-})
+import { createPostRoute } from './server/routes/posts/createPost'
+import { deletePostRoute } from './server/routes/posts/deletePost'
 
-const routes = require('@routes')
-console.log(routes)
+const routes: Route[] = [
+    createPostRoute,
+    deletePostRoute
+]
 
-const dbConnect = require('@db/connect')
-const initExpressApp = require('@server/initExpressApp')
+declare module 'express-session' {
+    interface SessionData {
+        _id?: string;
+    }
+}
 
 async function bootstrap() {
+    const app = express()
+
     console.log('DB 접속 시도')
-    await dbConnect()
+    await connectDB()
     console.log('DB 접속 완료')
 
     initExpressApp(app)
@@ -54,25 +57,5 @@ bootstrap()
 
 //npm i mongoose
 //qSIYNOQ8Ot52Icdt
-
-
-app.get('/users', (req, res) => {
-    return res.json(users)
-})
-
-
-
-app.delete('/users/:userId', (req, res) => {
-    const { userId } = req.params
-
-    const filterFunc = (user) => {
-        if (user.idx !== userId) return true
-        return false
-    }
-
-    users = users.filter(filterFunc)
-
-    return res.json({ success: true })
-})
 
 

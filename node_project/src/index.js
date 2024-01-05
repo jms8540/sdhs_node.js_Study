@@ -11,7 +11,7 @@ function encryptPassowed (password){
         .update(password)
         .digest('base64')
 }
-
+// new_nodeProject
 const users = [{
     idx: uuidv4,
     in: 'digitect1',
